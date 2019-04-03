@@ -1,0 +1,35 @@
+<html ng-app="acsApp">
+
+    <head>
+        <title> Fligh High</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    </head>
+
+    <body>
+        <script type="text/javascript" src="./index.js"></script>
+
+        <div>
+            Origin: 
+            <select id="airports"></select>
+
+        </div>
+        <br>
+        <br>
+        <div>
+            Destination : 
+            <select id="airportsDes"></select>
+
+        </div>
+        <br>
+        <br>
+
+        <button onclick="searchFlights()">Search Flights</button>
+        <div>
+                Available Fligts : 
+                <div id="availableFlights"></div>
+    
+        </div>
+
+    </body>
+    </html>

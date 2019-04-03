@@ -1,0 +1,1 @@
+define({  "name": "flyhigh",  "version": "1.0.0",  "description": "Flight tickets booking project",  "sampleUrl": false,  "defaultVersion": "0.0.0",  "apidoc": "0.3.0",  "generator": {    "name": "apidoc",    "time": "2019-03-01T07:24:31.528Z",    "url": "http://apidocjs.com",    "version": "0.17.7"  }});

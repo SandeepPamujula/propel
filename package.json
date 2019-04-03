@@ -1,0 +1,32 @@
+{
+    "name": "flyhigh",
+    "description": "Flight tickets booking project",
+    "version": "1.0.0",
+    "scripts": {
+        "doc": "apidoc -i src/routes -o docs/www",
+        "start": "pm2 start src",
+        "stop": "pm2 delete all",
+        "e2e": "node test/utils/init &&  mocha $(find ./src -name '*.e2e.js')",
+        "test": "node test/utils/init &&  mocha $(find ./src -name '*.spec.js')"
+    },
+    "dependencies": {
+        "bluebird": "^3.5.1",
+        "body-parser": "^1.18.3",
+        "bunyan": "^1.8.12",
+        "dotenv": "^6.2.0",
+        "express": "^4.16.3",
+        "lodash": "^4.17.11",
+        "mysql2": "^1.6.5",
+        "pg": "^7.8.1",
+        "pg-hstore": "^2.3.2",
+        "sequelize": "^4.42.0"
+    },
+    "devDependencies": {
+        "apidoc": "^0.17.6",
+        "eslint": "^4.19.0",
+        "mocha": "^5.0.4",
+        "nyc": "^13.3.0",
+        "eslint-config-warp": "^3.0.0",
+        "supertest": "^3.0.0"
+    }
+}

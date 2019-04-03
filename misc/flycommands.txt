@@ -1,0 +1,138 @@
+
+
+book a ticket:
+WITH book AS (
+		insert into booking(code,flight_chart_id, status, seats_booked) values ('SPI-BBCDE', 1, 'booked', 4) 
+		where (select (total_seats >= (total_booked_seats+4)) as canBook from flight inner join flight_chart as fc on fc.flight_code = code and fc.id=1)=true;
+	), fc AS (
+	UPDATE flight_chart set total_booked_seats = (total_booked_seats + 4) where id=1
+		returning id
+	) SELECT id from fc;
+cancel a ticket:
+WITH book AS (
+	UPDATE booking set status='cancelled' where code = 'SPI-BBCDE'
+	), fc AS (
+	UPDATE flight_chart set total_booked_seats = (total_booked_seats - (select seats_booked from booking where code ='SPI-ABCDE')) where id=1
+		returning id
+	) SELECT id from fc;
+
+CREATE TABLE role
+(
+    id SERIAL PRIMARY KEY,
+    name TEXT NOT NULL,
+    code TEXT NOT NULL,
+    hierarchy integer NOT NULL,
+    is_deleted boolean DEFAULT false
+);
+insert into role(name, code, hierarchy) values ('admin', 'admin', 1);
+
+CREATE TABLE users(
+	id SERIAL PRIMARY KEY,
+	first_name TEXT NOT NULL,
+	last_name TEXT NOT NULL,
+	email TEXT NOT NULL,
+	mobile TEXT,
+	selected_role_id BIGINT REFERENCES role(id),
+	created_by BIGINT,
+	created_date TIMESTAMP without time zone DEFAULT now(),
+	last_modified_by BIGINT,
+	last_modified_date TIMESTAMP without time zone,
+	is_deleted boolean DEFAULT false
+);
+
+insert into users(first_name, last_name, email, mobile, selected_role_id) values ('sandeep', 'p', 'reachsandeepkp@gmail.com', '9986108260', 1);
+
+
+CREATE TABLE airport(
+	id SERIAL PRIMARY KEY,
+	name TEXT NOT NULL,
+	city TEXT NOT NULL,
+	country TEXT NOT NULL,
+	search_match TEXT NOT NULL,
+	created_by BIGINT REFERENCES users(id),
+	created_date TIMESTAMP without time zone DEFAULT now(),
+	last_modified_by BIGINT REFERENCES users(id),
+	last_modified_date TIMESTAMP without time zone,
+	is_deleted boolean DEFAULT false
+);	
+
+insert into airport(name, city, country, search_match) values ('Kempegowda international', 'Bangalore', 'India', 'Bengaluru Bangalore Kempegowda');
+insert into airport(name, city, country, search_match) values ('Indira Gandhi International', 'Delhi', 'India', 'Delhi Indira Gandhi');
+insert into airport(name, city, country, search_match) values ('Sardar Vallabhbhai Patel International', 'Ahmedabad', 'India', 'Ahmedabad Gandhinagar Sardar Vallabhbhai Patel');
+insert into airport(name, city, country, search_match) values ('Chennai International', 'Chennai', 'India', 'Chennai');
+insert into airport(name, city, country, search_match) values ('Pakyong ', 'Gangtok', 'India', 'Gangtok Pakyong');
+
+
+CREATE TABLE flight(
+	id SERIAL PRIMARY KEY,
+	code TEXT UNIQUE NOT NULL,
+	organization TEXT NOT NULL,
+	total_seats SMALLINT NOT NULL,
+	created_by BIGINT REFERENCES users(id),
+	created_date TIMESTAMP without time zone DEFAULT now(),
+	last_modified_by BIGINT REFERENCES users(id),
+	last_modified_date TIMESTAMP without time zone,
+	is_deleted boolean DEFAULT false
+);
+ALTER TABLE flight ADD CONSTRAINT constraintname UNIQUE (code);
+
+
+insert into flight(code, organization, total_seats) values ('indigo-1', 'Indigo', 100);
+insert into flight(code, organization, total_seats) values ('indigo-2', 'Indigo', 100);
+insert into flight(code, organization, total_seats) values ('jet-1', 'Jet Airways', 100);
+insert into flight(code, organization, total_seats) values ('jet-2', 'Jet Airways', 100);
+insert into flight(code, organization, total_seats) values ('spice-1', 'SpiceJet', 100);
+insert into flight(code, organization, total_seats) values ('spice-2', 'SpiceJet', 100);
+
+
+CREATE TABLE flight_chart(
+	id SERIAL PRIMARY KEY,
+	origin_id BIGINT REFERENCES airport(id) NOT NULL,
+	destination_id BIGINT REFERENCES airport(id) NOT NULL,
+	start_time TIMESTAMP without time zone NOT NULL,
+	travel_duration SMALLINT NOT NULL,
+	flight_code TEXT REFERENCES flight(code),
+	total_booked_seats SMALLINT NOT NULL,
+	created_by BIGINT REFERENCES users(id),
+	created_date TIMESTAMP without time zone DEFAULT now(),
+	last_modified_by BIGINT REFERENCES users(id),
+	last_modified_date TIMESTAMP without time zone,
+	is_deleted boolean DEFAULT false
+);
+insert into flight_chart(origin_id, destination_id, start_time, travel_duration, flight_code, total_booked_seats) values (1, 2, '2019-03-01 07:00:00.00000', 160, 'indigo-1', 0);
+insert into flight_chart(origin_id, destination_id, start_time, travel_duration, flight_code, total_booked_seats) values (2, 1, '2019-03-01 08:00:00.00000', 160, 'indigo-2', 0);
+insert into flight_chart(origin_id, destination_id, start_time, travel_duration, flight_code, total_booked_seats) values (1, 2, '2019-03-01 14:30:00.00000', 160, 'indigo-2', 0);
+insert into flight_chart(origin_id, destination_id, start_time, travel_duration, flight_code, total_booked_seats) values (2, 1, '2019-03-01 15:00:00.00000', 160, 'indigo-1', 0);
+insert into flight_chart(origin_id, destination_id, start_time, travel_duration, flight_code, total_booked_seats) values (1, 2, '2019-03-01 07:00:00.00000', 160, 'spice-1', 0);
+insert into flight_chart(origin_id, destination_id, start_time, travel_duration, flight_code, total_booked_seats) values (2, 1, '2019-03-01 08:00:00.00000', 160, 'spice-2', 0);
+insert into flight_chart(origin_id, destination_id, start_time, travel_duration, flight_code, total_booked_seats) values (1, 2, '2019-03-01 14:30:00.00000', 160, 'spice-2', 0);
+insert into flight_chart(origin_id, destination_id, start_time, travel_duration, flight_code, total_booked_seats) values (2, 1, '2019-03-01 15:00:00.00000', 160, 'spice-1', 0);
+
+insert into flight_chart(origin_id, destination_id, start_time, travel_duration, flight_code, total_booked_seats) values (1, 2, '2019-03-02 07:00:00.00000', 160, 'indigo-1', 0);
+insert into flight_chart(origin_id, destination_id, start_time, travel_duration, flight_code, total_booked_seats) values (2, 1, '2019-03-02 08:00:00.00000', 160, 'indigo-2', 0);
+insert into flight_chart(origin_id, destination_id, start_time, travel_duration, flight_code, total_booked_seats) values (1, 2, '2019-03-02 14:30:00.00000', 160, 'indigo-2', 0);
+insert into flight_chart(origin_id, destination_id, start_time, travel_duration, flight_code, total_booked_seats) values (2, 1, '2019-03-02 15:00:00.00000', 160, 'indigo-1', 0);
+insert into flight_chart(origin_id, destination_id, start_time, travel_duration, flight_code, total_booked_seats) values (1, 2, '2019-03-02 07:00:00.00000', 160, 'spice-1', 0);
+insert into flight_chart(origin_id, destination_id, start_time, travel_duration, flight_code, total_booked_seats) values (2, 1, '2019-03-02 08:00:00.00000', 160, 'spice-2', 0);
+insert into flight_chart(origin_id, destination_id, start_time, travel_duration, flight_code, total_booked_seats) values (1, 2, '2019-03-02 14:30:00.00000', 160, 'spice-2', 0);
+insert into flight_chart(origin_id, destination_id, start_time, travel_duration, flight_code, total_booked_seats) values (2, 1, '2019-03-02 15:00:00.00000', 160, 'spice-1', 0);
+
+
+CREATE TABLE booking(
+	id SERIAL PRIMARY KEY,
+	code TEXT NOT NULL,
+	flight_chart_id BIGINT REFERENCES flight_chart(id) NOT NULL,
+	seats_booked SMALLINT NOT NULL,
+	status TEXT NOT NULL,
+	created_by BIGINT REFERENCES users(id),
+	created_date TIMESTAMP without time zone DEFAULT now(),
+	last_modified_by BIGINT REFERENCES users(id),
+	last_modified_date TIMESTAMP without time zone,
+	is_deleted boolean DEFAULT false
+);
+
+insert into booking(code,flight_chart_id, status, seats_booked) values('SPI-ABCDE', 1, 'booked' 4);
+
+
+
+	
