@@ -8,8 +8,8 @@ module.exports = {
         database: process.env.SQL_DATABASE || 'flyhigh',
         username: process.env.SQL_USERNAME || 'root',
         password: process.env.SQL_PASSWORD,
-        host: process.env.MYSQL_HOST,
-        port: process.env.MYSQL_PORT,
+        host: process.env.SQL_HOST,
+        port: process.env.SQL_PORT,
         dialect: 'postgres',
         enableLogging: false
     },
