@@ -6,16 +6,22 @@ const promise = require('bluebird');
 
 
 const db = require('../models/sql');
-    const errors = require('../constants/errors');
-
+const errors = require('../constants/errors');
+const AppErr = require('../middleware/errors/AppError');
 exports.index = async req => {
 
     const bookingId = req.params.bookingId;
 
     let booking = await db.booking.find({where: {code: bookingId}});
     if (!booking) {
-        return promise.reject(errors.invalid_booking_id);
+        // return promise.reject(errors.invalid_booking_id);
+        // throw new BaseError(...error.invalid_booking_id);
+        const  [httpStatus, message, errorCode] = errors.invalid_booking_id;
+        console.log('http status :: '+ httpStatus + '   '+message+'   '+ errorCode);
+        throw new AppErr(httpStatus, message, errorCode);
     }
+   
+  
     return booking;
 
 };
@@ -43,10 +49,15 @@ exports.cancel =  async (req, res) => {
 
     let booking = await db.booking.find({where: {code: bookingId}});
     if (!booking) {
-        return promise.reject(errors.invalid_booking_id);
+        // return promise.reject(errors.invalid_booking_id);
+        const  [httpStatus, message, errorCode] = errors.invalid_booking_id;
+        console.log('http status :: '+ httpStatus + '   '+message+'   '+ errorCode);
+        throw new AppErr(httpStatus, message, errorCode);    
     }
     if (booking.status === 'cancelled') {
-        return promise.reject(errors.invalid_booking_cancel);
+        const  [httpStatus, message, errorCode] = errors.invalid_booking_cancel;
+        console.log('http status :: '+ httpStatus + '   '+message+'   '+ errorCode);
+        throw new AppErr(httpStatus, message, errorCode);
     } else {
 
         const query = `WITH book AS (
